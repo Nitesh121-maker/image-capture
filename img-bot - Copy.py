@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def take_element_screenshot(url, output_filename):
+def take_element_screenshot(url, output_filename, country, datatype):
     start_time = time.time()
     driver = webdriver.Chrome()
     
@@ -97,22 +97,21 @@ def take_element_screenshot(url, output_filename):
             print(f"No divs with id '{container_id}' or class name 'col-lg-12' were found on the page.")
     finally:
         driver.quit()
-        uploadscreenshot(output_filename, datatype)
+        uploadscreenshot(output_filename, country, datatype)
         end_time = time.time()
         execution_time = end_time - start_time
         print("Execution time:", execution_time)
 
 
 
-def uploadscreenshot(output_filename,datatype):
-    url = "http://192.168.1.7:8000/country_alldata"
+def uploadscreenshot(output_filename, country, datatype):
+    url = f"http://192.168.1.9:8000/country_alldata"
     uploaddriver = webdriver.Chrome()
     try:
         uploaddriver.get(url)
         WebDriverWait(uploaddriver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, "alldatamain")))
         if datatype == 'import':
-            import_country_elements = uploaddriver.find_elements(By.XPATH, f"//td[translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{x.lower()}']")
-            # country_elements = uploaddriver.find_elements(By.XPATH, f"//td[translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{x.lower()}']")
+            import_country_elements = uploaddriver.find_elements(By.XPATH, f"//td[translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{country.lower()}']")
             country_element = import_country_elements[0] if len(import_country_elements) >= 2 else None
             if country_element:
                 parent_form = country_element.find_element(By.XPATH, "..")
@@ -136,10 +135,8 @@ def uploadscreenshot(output_filename,datatype):
                 print("Data uploaded successfully in import!")
                 
         elif datatype == 'export':
-            export_country_elements = uploaddriver.find_elements(By.XPATH, f"//td[translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{x.lower()}']")
-            print(len(export_country_elements))
+            export_country_elements = uploaddriver.find_elements(By.XPATH, f"//td[translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')='{country.lower()}']")
             country_element = export_country_elements[1] if len(export_country_elements) >= 2 else None
-            print('country_element',export_country_elements[1].text)
 
             if country_element:
                 parent_form = country_element.find_element(By.XPATH, "..")
@@ -166,10 +163,76 @@ def uploadscreenshot(output_filename,datatype):
     except Exception as e:
         print("Error:", e)
 
-x = input("Enter Country: ")
-datatype = input("Enter Datatype: ")
-url = "https://www.tradeimex.in/{}-{}".format(x.lower(), datatype.lower())
-print("Modified URL:", url)
 
-output_filename = "{}-{}-table-screenshot.png".format(x.lower(), datatype.lower())
-take_element_screenshot(url, output_filename)
+country_list = [
+    {"name": "Austria", "type": "import"},
+    {"name": "Austria", "type": "export"},
+    {"name": "Belgium", "type": "import"},
+    {"name": "Belgium", "type": "export"},
+    {"name": "Bulgaria", "type": "import"},
+    {"name": "Bulgaria", "type": "export"},
+    {"name": "Croatia", "type": "import"},
+    {"name": "Croatia", "type": "export"},
+    {"name": "Cyprus", "type": "import"},
+    {"name": "Cyprus", "type": "export"},
+    {"name": "Czech", "type": "import"},
+    {"name": "Czech", "type": "export"},
+    {"name": "Denmark", "type": "import"},
+    {"name": "Denmark", "type": "export"},
+    {"name": "Estonia", "type": "import"},
+    {"name": "Estonia", "type": "export"},
+    {"name": "Finland", "type": "import"},
+    {"name": "Finland", "type": "export"},
+    {"name": "France", "type": "import"},
+    {"name": "France", "type": "export"},
+    {"name": "Germany", "type": "import"},
+    {"name": "Germany", "type": "export"},
+    {"name": "Greece", "type": "import"},
+    {"name": "Greece", "type": "export"},
+    {"name": "Hungary", "type": "import"},
+    {"name": "Hungary", "type": "export"},
+    {"name": "Ireland", "type": "import"},
+    {"name": "Ireland", "type": "export"},
+    {"name": "Italy", "type": "import"},
+    {"name": "Italy", "type": "export"},
+    {"name": "Kazakhstan", "type": "import"},
+    {"name": "Kazakhstan", "type": "export"},
+    {"name": "Kosovo", "type": "import"},
+    {"name": "Kosovo", "type": "export"},
+    {"name": "Latvia", "type": "import"},
+    {"name": "Latvia", "type": "export"},
+    {"name": "Lithuania", "type": "import"},
+    {"name": "Lithuania", "type": "export"},
+    {"name": "Luxembourg", "type": "import"},
+    {"name": "Luxembourg", "type": "export"},
+    {"name": "Malta", "type": "import"},
+    {"name": "Malta", "type": "export"},
+    {"name": "Moldova", "type": "import"},
+    {"name": "Moldova", "type": "export"},
+    {"name": "Netherlands", "type": "import"},
+    {"name": "Netherlands", "type": "export"},
+    {"name": "Poland", "type": "import"},
+    {"name": "Poland", "type": "export"},
+    {"name": "Portugal", "type": "import"},
+    {"name": "Portugal", "type": "export"},
+    {"name": "Russia", "type": "import"},
+    {"name": "Russia", "type": "export"},
+    {"name": "Romania", "type": "import"},
+    {"name": "Romania", "type": "export"},
+    {"name": "Slovakia", "type": "import"},
+    {"name": "Slovakia", "type": "export"},
+    {"name": "Slovenia", "type": "import"},
+    {"name": "Slovenia", "type": "export"},
+    {"name": "Spain", "type": "import"},
+    {"name": "Spain", "type": "export"},
+    {"name": "Sweden", "type": "import"},
+    {"name": "Sweden", "type": "export"}
+]
+for country_info in country_list:
+    country_name = country_info["name"]
+    datatype = country_info["type"]
+    url = f"https://www.tradeimex.in/{country_name.lower()}-{datatype.lower()}"
+    print("Modified URL:", url)
+
+    output_filename = f"{country_name.lower()}-{datatype.lower()}-table-screenshot.png"
+    take_element_screenshot(url, output_filename, country_name, datatype)
